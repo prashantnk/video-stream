@@ -1,10 +1,12 @@
+import { CHANGE_SIGNIN_STATUS } from '../actions/types';
 const INITIAL_STATE = {
-    isSignedIn: null
+    isSignedIn: null,
+    userId: null
 };
 const authChange = (state = INITIAL_STATE, action) => {
-    switch (action.payload) {
-        case "CHANGE_SIGNIN_STATUS":
-            return { ...state, isSignedIn: action.payload };
+    switch (action.type) {
+        case CHANGE_SIGNIN_STATUS:
+            return action.payload;
         default:
             return state;
     }

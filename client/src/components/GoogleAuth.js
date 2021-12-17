@@ -1,40 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import { changeSignInStatus } from '../actions';
 
-const GoogleAuth = (props) => {
-    const [signedIn, setSignIn] = useState(null);
-    const [auth, setAuth] = useState(null);
+const GoogleAuth = ({ signedIn, changeSignInStatus }) => {
+    const authRef = useRef();
+    const onSignInChange = useCallback((signIn) => {
+        if (signIn) changeSignInStatus(true, authRef.current.currentUser.get().getId());
+        else changeSignInStatus(false, null);
+    }, [changeSignInStatus]);
+
     useEffect(() => {
         window.gapi.load('auth2', () => {
             window.gapi.auth2.init({
                 clientId: "582152842626-9r14ipembq2t6aoumibhvm9sph6msum4.apps.googleusercontent.com",
                 scope: "email"
             }).then(() => {
-                setAuth(window.gapi.auth2.getAuthInstance());
+
+                authRef.current = window.gapi.auth2.getAuthInstance();
+                onSignInChange(authRef.current.isSignedIn.get());
+                authRef.current.isSignedIn.listen(onSignInChange);
             });
         });
-    }, []);
+    }, [onSignInChange]);
 
-    useEffect(() => {
-        if (!auth) return;
-        // console.log(auth);
-        setSignIn(auth.isSignedIn.get());
-        auth.isSignedIn.listen(onSignInChange);
-    }, [auth]);
 
-    const onSignInChange = (signIn) => {
-        setSignIn(signIn);
-        changeSignInStatus(signIn);
-    }
 
     const forSignOut = () => {
-        auth.signOut().catch((err) => {
+        authRef.current.signOut().catch((err) => {
             console.log(err.error);
         });
     }
+
     const forSignIn = () => {
-        auth.signIn().catch((err) => {
+        authRef.current.signIn().catch((err) => {
             console.log(err.error);
         });
     }
