@@ -15,7 +15,6 @@ const GoogleAuth = ({ signedIn, changeSignInStatus }) => {
                 clientId: "582152842626-9r14ipembq2t6aoumibhvm9sph6msum4.apps.googleusercontent.com",
                 scope: "email"
             }).then(() => {
-
                 authRef.current = window.gapi.auth2.getAuthInstance();
                 onSignInChange(authRef.current.isSignedIn.get());
                 authRef.current.isSignedIn.listen(onSignInChange);
