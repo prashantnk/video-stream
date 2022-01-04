@@ -1,5 +1,6 @@
 import {
     CHANGE_SIGNIN_STATUS,
+    GET_GAPI_INSTANCE,
     CREATE_STREAM,
     FETCH_STREAMS,
     FETCH_STREAM,
@@ -56,5 +57,22 @@ export const deleteStream = (id) => {
     return async (dispatch) => {
         await streams.delete(`/streams/${id}`);
         dispatch({ type: DELETE_STREAM, payload: id });
+        history.push("/");
+    }
+}
+
+export const getGapiInstance = () => {
+    return async (dispatch) => {
+        window.gapi.load('auth2', () => {
+            window.gapi.auth2.init({
+                clientId: "582152842626-9r14ipembq2t6aoumibhvm9sph6msum4.apps.googleusercontent.com",
+                scope: "email"
+            }).then(() => {
+                dispatch({
+                    type: GET_GAPI_INSTANCE,
+                    payload: window.gapi.auth2.getAuthInstance()
+                });
+            });
+        });
     }
 }

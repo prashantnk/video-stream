@@ -14,13 +14,13 @@ const StreamEdit = (props) => {
     }, [fetchStream, id]);
 
     const onSubmit = (formValues) => {
-        props.editStream(id, formValues);
-    }
-
-    if (!props.isSignedIn) {
-        history.push('/');
+        if (props.isSignedIn) props.editStream(id, formValues);
+        else props.gapiInstance.signIn();
     }
     if (!props.stream) return <>Loading!</>;
+    if (props.isSignedIn && props.stream && props.stream.userId !== props.userId) {
+        history.push('/');
+    }
     return (
         <div >
             <h2>Edit The Stream : </h2>
@@ -32,7 +32,9 @@ const StreamEdit = (props) => {
 const mapStateToProps = (state, ownProps) => {
     return {
         stream: state.streams[ownProps.match.params.id],
-        isSignedIn: state.auth.isSignedIn
+        isSignedIn: state.auth.isSignedIn,
+        userId: state.auth.userId,
+        gapiInstance: state.auth.gapiInstance
     };
 }
 

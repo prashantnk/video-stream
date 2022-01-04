@@ -1,37 +1,30 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { changeSignInStatus } from '../actions';
 
-const GoogleAuth = ({ signedIn, changeSignInStatus }) => {
-    const authRef = useRef();
+const GoogleAuth = ({ signedIn, changeSignInStatus, gapiInstance }) => {
     const onSignInChange = useCallback((signIn) => {
-        if (signIn) changeSignInStatus(true, authRef.current.currentUser.get().getId());
+        if (!gapiInstance) return;
+        if (signIn) changeSignInStatus(true, gapiInstance.currentUser.get().getId());
         else changeSignInStatus(false, null);
-    }, [changeSignInStatus]);
+    }, [changeSignInStatus, gapiInstance]);
 
     useEffect(() => {
-        window.gapi.load('auth2', () => {
-            window.gapi.auth2.init({
-                clientId: "582152842626-9r14ipembq2t6aoumibhvm9sph6msum4.apps.googleusercontent.com",
-                scope: "email"
-            }).then(() => {
-                authRef.current = window.gapi.auth2.getAuthInstance();
-                onSignInChange(authRef.current.isSignedIn.get());
-                authRef.current.isSignedIn.listen(onSignInChange);
-            });
-        });
-    }, [onSignInChange]);
+        if (!gapiInstance) return;
+        onSignInChange(gapiInstance.isSignedIn.get());
+        gapiInstance.isSignedIn.listen(onSignInChange);
+    }, [onSignInChange, gapiInstance]);
 
 
 
     const forSignOut = () => {
-        authRef.current.signOut().catch((err) => {
+        gapiInstance.signOut().catch((err) => {
             console.log(err.error);
         });
     }
 
     const forSignIn = () => {
-        authRef.current.signIn().catch((err) => {
+        gapiInstance.signIn().catch((err) => {
             console.log(err.error);
         });
     }
@@ -68,7 +61,8 @@ const GoogleAuth = ({ signedIn, changeSignInStatus }) => {
 
 const mapStateToProps = (state) => {
     return {
-        signedIn: state.auth.isSignedIn
+        signedIn: state.auth.isSignedIn,
+        gapiInstance: state.auth.gapiInstance
     };
 };
 
