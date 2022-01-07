@@ -32,7 +32,9 @@ class StreamList extends React.Component {
                     {this.renderAdminButton(stream)}
                     <i className='play icon large middle aligned' />
                     <div className='content'>
-                        <div className='ui header'>{stream.title}</div>
+                        <div className='ui header'>
+                            <Link to={`/streams/${stream.id}`}> {stream.title} </Link>
+                        </div>
                         <div className='description'>
                             {stream.description}
                         </div>

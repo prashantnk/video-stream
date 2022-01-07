@@ -1,20 +1,22 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { changeSignInStatus } from '../actions';
+import { changeSignInStatus, getGapiInstance } from '../actions';
 
-const GoogleAuth = ({ signedIn, changeSignInStatus, gapiInstance }) => {
-    const onSignInChange = useCallback((signIn) => {
+const GoogleAuth = ({ signedIn, changeSignInStatus, gapiInstance, getGapiInstance }) => {
+    useEffect(() => {
         if (!gapiInstance) return;
-        if (signIn) changeSignInStatus(true, gapiInstance.currentUser.get().getId());
-        else changeSignInStatus(false, null);
+        const onSignInChange = (signIn) => {
+            if (!gapiInstance) return;
+            if (signIn) changeSignInStatus(true, gapiInstance.currentUser.get().getId());
+            else changeSignInStatus(false, null);
+        }
+        onSignInChange(gapiInstance.isSignedIn.get());
+        gapiInstance.isSignedIn.listen(onSignInChange);
     }, [changeSignInStatus, gapiInstance]);
 
     useEffect(() => {
-        if (!gapiInstance) return;
-        onSignInChange(gapiInstance.isSignedIn.get());
-        gapiInstance.isSignedIn.listen(onSignInChange);
-    }, [onSignInChange, gapiInstance]);
-
+        getGapiInstance();
+    }, [getGapiInstance]);
 
 
     const forSignOut = () => {
@@ -66,4 +68,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { changeSignInStatus })(GoogleAuth);
+export default connect(mapStateToProps, { changeSignInStatus, getGapiInstance })(GoogleAuth);
