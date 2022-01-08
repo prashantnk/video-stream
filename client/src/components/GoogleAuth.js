@@ -1,22 +1,12 @@
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
-import { changeSignInStatus, getGapiInstance } from '../actions';
+import { getGapiInstance } from '../actions';
 
-const GoogleAuth = ({ signedIn, changeSignInStatus, gapiInstance, getGapiInstance }) => {
-    useEffect(() => {
-        if (!gapiInstance) return;
-        const onSignInChange = (signIn) => {
-            if (!gapiInstance) return;
-            if (signIn) changeSignInStatus(true, gapiInstance.currentUser.get().getId());
-            else changeSignInStatus(false, null);
-        }
-        onSignInChange(gapiInstance.isSignedIn.get());
-        gapiInstance.isSignedIn.listen(onSignInChange);
-    }, [changeSignInStatus, gapiInstance]);
+const GoogleAuth = ({ signedIn, gapiInstance, getGapiInstance }) => {
 
     useEffect(() => {
-        getGapiInstance();
-    }, [getGapiInstance]);
+        if (!gapiInstance) getGapiInstance();
+    }, [getGapiInstance, gapiInstance]);
 
 
     const forSignOut = () => {
@@ -68,4 +58,4 @@ const mapStateToProps = (state) => {
     };
 };
 
-export default connect(mapStateToProps, { changeSignInStatus, getGapiInstance })(GoogleAuth);
+export default connect(mapStateToProps, { getGapiInstance })(GoogleAuth);

@@ -68,9 +68,21 @@ export const getGapiInstance = () => {
                 clientId: "582152842626-9r14ipembq2t6aoumibhvm9sph6msum4.apps.googleusercontent.com",
                 scope: "email"
             }).then(() => {
+                const gapiInstance = window.gapi.auth2.getAuthInstance();
+
+                const onSignInChange = (signIn) => {
+                    if (!gapiInstance) return;
+                    if (signIn) dispatch(changeSignInStatus(true, gapiInstance.currentUser.get().getId()));
+                    else dispatch(changeSignInStatus(false, null));
+                }
+
+                onSignInChange(gapiInstance.isSignedIn.get());
+                gapiInstance.isSignedIn.listen(onSignInChange);
+
+
                 dispatch({
                     type: GET_GAPI_INSTANCE,
-                    payload: window.gapi.auth2.getAuthInstance()
+                    payload: gapiInstance
                 });
             });
         });

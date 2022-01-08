@@ -27,6 +27,7 @@ class StreamList extends React.Component {
     renderList = () => {
         if (!this.props.streams) return null;
         const renderedList = this.props.streams.map((stream) => {
+            if (!this.props.handleShowStream(stream)) return null;
             return (
                 <div className='item' key={stream.id}>
                     {this.renderAdminButton(stream)}
@@ -48,7 +49,7 @@ class StreamList extends React.Component {
     render() {
         return (
             <div>
-                <h2> Streams : </h2>
+                <h2> {this.props.label} </h2>
                 <div className='ui celled list'>
                     {this.renderList()}
                 </div>
@@ -56,6 +57,11 @@ class StreamList extends React.Component {
             </div>
         );
     }
+};
+
+StreamList.defaultProps = {
+    handleShowStream: () => true,
+    label: "All Streams : "
 };
 
 const mapStateToProps = (state) => {
